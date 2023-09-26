@@ -62,9 +62,11 @@ module.exports = async (req, res) => {
         }),
       },
     });
-
+    // Set CORS headers
+    res.setHeader('Access-Control-Allow-Origin', '*'); // Adjust as needed
+    res.setHeader('Access-Control-Allow-Methods', 'GET,POST');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
     // Send the file content as response
-    res.setHeader('Access-Control-Allow-Origin', '*'); // Add this line
     res.status(200).send(fileContentResponse.data);
   } catch (error) {
     console.error('Error:', error);
