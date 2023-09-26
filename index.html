@@ -2,31 +2,20 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Dropbox API via Vercel</title>
+  <title>Dropbox API with Netlify</title>
 </head>
 <body>
-  <button id="checkButton">Check Dropbox</button>
+  <button id="fetchFileContent">Fetch File Content</button>
   <textarea id="fileContent" rows="10" cols="30"></textarea>
 
   <script>
-    document.getElementById('checkButton').addEventListener('click', async () => {
+    document.getElementById('fetchFileContent').addEventListener('click', async () => {
       try {
-        // Replace with the URL of your Vercel Serverless function
-        const url = 'https://schedule-git-main-tiago-henriques-projects.vercel.app/api/dropbox';
-        
-        const response = await fetch(url, {
-          method: 'POST',
-        });
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const fileContent = await response.text();
-        document.getElementById('fileContent').textContent = fileContent;
+        const response = await fetch('/.netlify/functions/fetchFileContent');
+        const data = await response.text();
+        document.getElementById('fileContent').value = data;
       } catch (error) {
-        console.error('Error:', error);
-        alert('Failed to check Dropbox');
+        console.error('Error fetching file content:', error);
       }
     });
   </script>
