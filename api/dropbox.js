@@ -64,6 +64,7 @@ module.exports = async (req, res) => {
     });
 
     // Send the file content as response
+    res.setHeader('Access-Control-Allow-Origin', '*'); // Add this line
     res.status(200).send(fileContentResponse.data);
   } catch (error) {
     console.error('Error:', error);
