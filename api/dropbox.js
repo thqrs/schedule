@@ -3,8 +3,9 @@ const fetch = require('node-fetch');
 
 // Define the path to your Excel file in Dropbox
 const filePath = "/YourDropboxFolderPath/YourExcelFileName.xlsx";
-
 module.exports = async (req, res) => {
+    try {
+        console.log('Request Body:', req.body);
     const dbx = new Dropbox({ accessToken: process.env.DROPBOX_ACCESS_TOKEN, fetch: fetch });
     const { action, coordinates, text } = req.body;
 
@@ -19,4 +20,9 @@ module.exports = async (req, res) => {
     } else {
         res.status(400).send({ success: false, message: "Invalid action!" });
     }
+            } catch (error) {
+        console.error('Error:', error.message);
+        res.status(500).send({ error: error.message });
+    }
 };
+
