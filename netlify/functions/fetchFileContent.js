@@ -1,5 +1,6 @@
-const fetch = require('node-fetch');
+const axios = require('axios');
 const DROPBOX_API_URL = "https://api.dropboxapi.com/2/files/upload";
+const DROPBOX_DOWNLOAD_URL = "https://content.dropboxapi.com/2/files/download";
 const DROPBOX_FILE_PATH = "/vercel_check.txt";
 
 exports.handler = async function (event, context) {
@@ -12,40 +13,30 @@ exports.handler = async function (event, context) {
     // Get current time
     const currentTime = new Date().toISOString();
 
-    // Check if the file exists and create/write to it
-    const response = await fetch(DROPBOX_API_URL, {
-      method: 'POST',
+    // Write to the file
+    await axios.post(DROPBOX_API_URL, null, {
       headers: {
         'Authorization': `Bearer ${accessToken}`,
         'Dropbox-API-Arg': JSON.stringify({
           path: DROPBOX_FILE_PATH,
-          mode: 'add',
+          mode: 'overwrite',
         }),
         'Content-Type': 'application/octet-stream',
       },
-      body: currentTime,
+      data: currentTime,
     });
 
-    if (!response.ok) {
-      throw new Error(`Failed to write to Dropbox file: ${response.statusText}`);
-    }
-
     // Fetch the content of the file
-    const fileContentResponse = await fetch(DROPBOX_API_URL, {
-      method: 'GET',
+    const fileContentResponse = await axios.post(DROPBOX_DOWNLOAD_URL, null, {
       headers: {
-        'Authorization': `Bearer YOUR_DROPBOX_ACCESS_TOKEN`,
+        'Authorization': `Bearer ${accessToken}`,
         'Dropbox-API-Arg': JSON.stringify({
           path: DROPBOX_FILE_PATH,
         }),
       },
     });
 
-    if (!fileContentResponse.ok) {
-      throw new Error(`Failed to read Dropbox file: ${fileContentResponse.statusText}`);
-    }
-
-    const fileContent = await fileContentResponse.text();
+    const fileContent = fileContentResponse.data;
     return {
       statusCode: 200,
       body: fileContent,
@@ -54,7 +45,7 @@ exports.handler = async function (event, context) {
     console.error('Error:', error);
     return {
       statusCode: 500,
-      body: error.message,
+      body: error.message || 'Internal Server Error',
     };
   }
 };
